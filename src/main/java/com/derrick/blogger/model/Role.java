@@ -25,10 +25,10 @@ public class Role implements GrantedAuthority {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer roleId;
 
-    private String authorities;
+    private String authority;
 
     @Override
     public String getAuthority() {
-        return null;
+        return this.authority;
     }
 }

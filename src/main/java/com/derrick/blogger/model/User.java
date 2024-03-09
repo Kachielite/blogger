@@ -10,16 +10,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 
 @Builder
 @Setter
@@ -32,6 +30,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
     private Integer id;
+
     private String username;
     private String password;
     private String email;
@@ -40,14 +39,12 @@ public class User implements UserDetails {
     @JoinTable(
             name = "user_role",
             joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")}
-    )
+            inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Set<Role> authorities;
 
-    public User(){
+    public User() {
         this.authorities = new HashSet<>();
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
