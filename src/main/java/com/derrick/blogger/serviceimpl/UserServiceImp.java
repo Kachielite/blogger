@@ -15,10 +15,10 @@ public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
 
-
     @Override
     public UserDetails loadUserByUsername(String username) {
-        return userRepository.findUserByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+        return userRepository
+                .findUserByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

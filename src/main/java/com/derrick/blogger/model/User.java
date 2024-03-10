@@ -33,7 +33,6 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private Integer id;
 
-
     private String username;
     private String password;
 
