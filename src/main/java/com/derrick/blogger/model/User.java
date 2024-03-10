@@ -15,12 +15,14 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Builder
 @Setter
+@Getter
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
@@ -31,9 +33,9 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private Integer id;
 
+
     private String username;
     private String password;
-    private String email;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
