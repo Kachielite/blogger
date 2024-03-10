@@ -6,6 +6,7 @@ import com.derrick.blogger.dto.RegisterRequestDTO;
 import com.derrick.blogger.exceptions.ConflictException;
 import com.derrick.blogger.exceptions.InternalServerErrorException;
 import com.derrick.blogger.exceptions.InvalidAuthRequestException;
+import com.derrick.blogger.exceptions.NotFoundException;
 import com.derrick.blogger.model.Role;
 import com.derrick.blogger.model.User;
 import com.derrick.blogger.repository.RoleRepository;
@@ -36,13 +37,14 @@ public class AuthenticationServiceImp implements AuthenticationService {
     private final TokenService tokenService;
 
     @Override
-    public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) throws InvalidAuthRequestException, ConflictException {
+    public AuthResponseDTO login(LoginRequestDTO loginRequestDTO)
+            throws InvalidAuthRequestException, NotFoundException {
         try {
             Optional<User> user = userRepository.findUserByUsername(loginRequestDTO.username());
 
             if (user.isEmpty()) {
                 log.error("User does not exist");
-                throw new ConflictException("User not found"); // Properly instantiate NotFoundException
+                throw new NotFoundException("User not found"); // Properly instantiate NotFoundException
             }
 
             Authentication auth = authenticationManager.authenticate(
@@ -57,18 +59,19 @@ public class AuthenticationServiceImp implements AuthenticationService {
                     .token(token)
                     .build();
 
-        } catch (ConflictException e) {
+        } catch (NotFoundException e) {
             log.error("Error user not found: {}", e.getMessage(), e);
             throw e; // Re-throw NotFoundException
         } catch (AuthenticationException e) {
             log.error("Error authenticating user: {}", e.getMessage(), e);
-            throw new InvalidAuthRequestException("Invalid authentication request. Please check your credentials and try again.");
+            throw new InvalidAuthRequestException(
+                    "Invalid authentication request. Please check your credentials and try again.");
         }
     }
 
-
     @Override
-    public AuthResponseDTO register(RegisterRequestDTO registerRequestDTO) throws ConflictException, InternalServerErrorException {
+    public AuthResponseDTO register(RegisterRequestDTO registerRequestDTO)
+            throws ConflictException, InternalServerErrorException {
 
         try {
             Optional<User> user = userRepository.findUserByUsername(registerRequestDTO.username());
@@ -94,10 +97,10 @@ public class AuthenticationServiceImp implements AuthenticationService {
                     .message("User registered successfully")
                     .token(null)
                     .build();
-        }catch (ConflictException e) {
+        } catch (ConflictException e) {
             log.error("Error user already exist: {}", e.getMessage(), e);
             throw e; // Re-throw NotFoundException
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Error authenticating user: {}", e.getMessage(), e);
             throw new InternalServerErrorException("User could not be registered");
         }
