@@ -44,7 +44,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
             if (user.isEmpty()) {
                 log.error("User does not exist");
-                throw new NotFoundException("User not found"); // Properly instantiate NotFoundException
+                throw new NotFoundException("The user associated with the provided username could not be found.");
             }
 
             Authentication auth = authenticationManager.authenticate(
@@ -54,6 +54,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
             String token = tokenService.generateJwt(auth);
 
             log.info("User successfully authenticated");
+
             return AuthResponseDTO.builder()
                     .message("User authenticated successfully")
                     .token(token)
@@ -77,8 +78,9 @@ public class AuthenticationServiceImp implements AuthenticationService {
             Optional<User> user = userRepository.findUserByUsername(registerRequestDTO.username());
 
             if (user.isPresent()) {
-                log.error("User not found");
-                throw new ConflictException("User not found");
+                log.error("The username already exist");
+                throw new ConflictException(
+                        "The username you've chosen is already in use. Please select a different one");
             }
 
             String encodedPassword = passwordEncoder.encode(registerRequestDTO.password());
@@ -94,7 +96,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
             userRepository.save(newUser);
             return AuthResponseDTO.builder()
-                    .message("User registered successfully")
+                    .message("Registration successful!")
                     .token(null)
                     .build();
         } catch (ConflictException e) {

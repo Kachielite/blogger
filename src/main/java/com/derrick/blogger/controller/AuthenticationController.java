@@ -11,6 +11,7 @@ import com.derrick.blogger.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,25 +23,26 @@ public class AuthenticationController {
 
     public final AuthenticationService authenticationService;
 
-    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterRequestDTO registerRequestDTO)
-            throws ConflictException, InternalServerErrorException {
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
         try {
             return new ResponseEntity<>(authenticationService.register(registerRequestDTO), HttpStatus.CREATED);
         } catch (ConflictException e) {
-            throw new ConflictException("User already exist");
+            return new ResponseEntity<>(AuthResponseDTO.messageOnly(e.getMessage()), HttpStatus.CONFLICT);
         } catch (InternalServerErrorException e) {
-            throw new InternalServerErrorException("User creation failed");
+            return new ResponseEntity<>(AuthResponseDTO.messageOnly(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO)
-            throws NotFoundException, InvalidAuthRequestException {
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         try {
-            return new ResponseEntity<>(authenticationService.login(loginRequestDTO), HttpStatus.OK);
+            AuthResponseDTO responseDTO = authenticationService.login(loginRequestDTO);
+            return ResponseEntity.ok(responseDTO);
         } catch (NotFoundException e) {
-            throw new NotFoundException("User does not exist");
+            return new ResponseEntity<>(AuthResponseDTO.messageOnly(e.getMessage()), HttpStatus.NOT_FOUND);
         } catch (InvalidAuthRequestException e) {
-            throw new InvalidAuthRequestException("User registration failed");
+            return new ResponseEntity<>(AuthResponseDTO.messageOnly(e.getMessage()), HttpStatus.UNAUTHORIZED);
         }
     }
 }

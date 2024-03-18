@@ -24,3 +24,6 @@ server:
     context-path: /api/v1
   error:
     include-stacktrace: on_param
+logging:
+  level:
+    org.springframework.security: DEBUG
