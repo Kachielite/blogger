@@ -36,28 +36,34 @@ This project is currently in development. Contributions, suggestions, and feedba
 
 1. Clone the repository:
 
-
-    git clone https://github.com/your_username/blogger-app.git
-
+    ```bash
+    git clone https://github.com/Kachielite/blogger.git
+    ```
 
 2. Navigate to the project directory:
 
-
+    ```bash
     cd blogger-app
-
+    ```
 
 3. Install dependencies:
 
-
+    ```bash
     ./gradlew build
+    ```
 
 
 4. Run the application:
 
-
+    ```bash
     java -jar build/libs/blogger-app.jar
+    ```
 
-5. Access the application in your web browser at `http://localhost:8080`.
+5. Access the API Docs on
+
+     ```
+    http://localhost:8080/api/v1/swagger-ui/index.html
+    ```
 
 ## Database
 

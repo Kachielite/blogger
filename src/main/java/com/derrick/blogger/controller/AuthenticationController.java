@@ -33,8 +33,8 @@ public class AuthenticationController {
     @Operation(summary = "Create new user")
     @ApiResponses(
             value = {
-                    @ApiResponse(responseCode = "201", description = "Created"),
-                    @ApiResponse(responseCode = "409", description = "Conflict"),
+                @ApiResponse(responseCode = "201", description = "Created"),
+                @ApiResponse(responseCode = "409", description = "Conflict"),
             })
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
@@ -51,16 +51,29 @@ public class AuthenticationController {
     @Operation(summary = "Authenticate user")
     @ApiResponses(
             value = {
-                    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AuthResponseDTO.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized",
-                            content = @Content(schema = @Schema(implementation = AuthResponseDTO.class,
-                                    example = "{\"message\": \"Unauthorized\"}"))),
-                    @ApiResponse(responseCode = "404", description = "Not found",
-                            content = @Content(schema = @Schema(implementation = AuthResponseDTO.class,
-                                    example = "{\"message\": \"Not found\"}"))),
-
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content = @Content(schema = @Schema(implementation = AuthResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content =
+                                @Content(
+                                        schema =
+                                                @Schema(
+                                                        implementation = AuthResponseDTO.class,
+                                                        example = "{\"message\": \"Unauthorized\"}"))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not found",
+                        content =
+                                @Content(
+                                        schema =
+                                                @Schema(
+                                                        implementation = AuthResponseDTO.class,
+                                                        example = "{\"message\": \"Not found\"}"))),
             })
-
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         try {
