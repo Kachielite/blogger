@@ -36,6 +36,15 @@ public class User implements UserDetails {
     private String username;
     private String password;
 
+    @Column(name = "profile_photo")
+    private String profilePhoto;
+
+    private String bio;
+    private String linkedIn;
+    private String x;
+    private String instagram;
+    private String facebook;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_role",
