@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -16,4 +18,5 @@ import lombok.RequiredArgsConstructor;
 public class AuthResponseDTO {
     private String message;
     private String token;
+    private Map<String, String> errors;
 }

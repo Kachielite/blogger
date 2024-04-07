@@ -14,13 +14,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,9 +43,10 @@ public class AuthenticationController {
                 @ApiResponse(responseCode = "409", description = "Conflict"),
             })
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
+    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO, BindingResult bindingResult) {
         try {
-            // TODO: Validate input to ensure that there a no null values
+            ResponseEntity<AuthResponseDTO> errors = validateInput(bindingResult);
+            if (errors != null) return errors;
             return new ResponseEntity<>(authenticationService.register(registerRequestDTO), HttpStatus.CREATED);
         } catch (ConflictException e) {
             return new ResponseEntity<>(
@@ -77,8 +84,10 @@ public class AuthenticationController {
                                                         example = "{\"message\": \"Not found\"}"))),
             })
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, BindingResult bindingResult) {
         try {
+            ResponseEntity<AuthResponseDTO> errors = validateInput(bindingResult);
+            if (errors != null) return errors;
             AuthResponseDTO responseDTO = authenticationService.login(loginRequestDTO);
             return ResponseEntity.ok(responseDTO);
         } catch (NotFoundException e) {
@@ -88,5 +97,17 @@ public class AuthenticationController {
             return new ResponseEntity<>(
                     AuthResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    private ResponseEntity<AuthResponseDTO> validateInput(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error -> {
+                errors.put(error.getField(), error.getDefaultMessage());
+            });
+            // Return bad request with validation errors
+            return ResponseEntity.badRequest().body(AuthResponseDTO.builder().message("Validation error").errors(errors).build());
+        }
+        return null;
     }
 }

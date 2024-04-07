@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -16,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class JWTUtils {
     private final SecretKey key;
     private static final long EXPIRATION_TIME = 8640000;
-
 
     public JWTUtils() {
         String secret = "fsfsfif89f7fuewf8f7923q082376gafbondvbiufgqe9w8f793fnf0wfh9wg3f3fb";

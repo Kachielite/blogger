@@ -1,15 +1,13 @@
 package com.derrick.blogger.dto;
 
-
 import com.derrick.blogger.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @Data
 @Builder
@@ -22,8 +20,7 @@ public class UserResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<User> users;
 
-    public static UserResponseDTO messageOnly(String message){
+    public static UserResponseDTO messageOnly(String message) {
         return UserResponseDTO.builder().message(message).build();
     }
-
 }
