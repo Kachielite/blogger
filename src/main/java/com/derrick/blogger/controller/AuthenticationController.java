@@ -42,9 +42,11 @@ public class AuthenticationController {
             // TODO: Validate input to ensure that there a no null values
             return new ResponseEntity<>(authenticationService.register(registerRequestDTO), HttpStatus.CREATED);
         } catch (ConflictException e) {
-            return new ResponseEntity<>(AuthResponseDTO.messageOnly(e.getMessage()), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(
+                    AuthResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.CONFLICT);
         } catch (InternalServerErrorException e) {
-            return new ResponseEntity<>(AuthResponseDTO.messageOnly(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(
+                    AuthResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -80,9 +82,11 @@ public class AuthenticationController {
             AuthResponseDTO responseDTO = authenticationService.login(loginRequestDTO);
             return ResponseEntity.ok(responseDTO);
         } catch (NotFoundException e) {
-            return new ResponseEntity<>(AuthResponseDTO.messageOnly(e.getMessage()), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(
+                    AuthResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.NOT_FOUND);
         } catch (InvalidAuthRequestException e) {
-            return new ResponseEntity<>(AuthResponseDTO.messageOnly(e.getMessage()), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(
+                    AuthResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.UNAUTHORIZED);
         }
     }
 }

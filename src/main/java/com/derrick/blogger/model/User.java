@@ -2,34 +2,30 @@ package com.derrick.blogger.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Builder
 @Setter
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -39,8 +35,9 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private Integer id;
 
-    private String username;
+    private String email;
     private String password;
+    private String role;
 
     @Column(name = "profile_photo")
     private String profilePhoto;
@@ -51,21 +48,9 @@ public class User implements UserDetails {
     private String instagram;
     private String facebook;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @Cascade(CascadeType.ALL)
-    @JoinTable(
-            name = "user_role",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private Set<Role> authorities;
-
-    public User() {
-        this.authorities = new HashSet<>();
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override
@@ -75,7 +60,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.email;
     }
 
     @Override

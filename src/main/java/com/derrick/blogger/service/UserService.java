@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface UserService extends UserDetailsService {
-    UserDetails loadUserByUsername(String username);
+    UserDetails loadUserByUsername(String email);
 }
