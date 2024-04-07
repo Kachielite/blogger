@@ -7,15 +7,11 @@ import com.derrick.blogger.exceptions.ConflictException;
 import com.derrick.blogger.exceptions.InternalServerErrorException;
 import com.derrick.blogger.exceptions.InvalidAuthRequestException;
 import com.derrick.blogger.exceptions.NotFoundException;
-import com.derrick.blogger.model.Role;
 import com.derrick.blogger.model.User;
-import com.derrick.blogger.repository.RoleRepository;
 import com.derrick.blogger.repository.UserRepository;
 import com.derrick.blogger.service.AuthenticationService;
-import com.derrick.blogger.service.TokenService;
-import java.util.HashSet;
+import com.derrick.blogger.utils.JWTUtils;
 import java.util.Optional;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,16 +27,15 @@ import org.springframework.stereotype.Service;
 public class AuthenticationServiceImp implements AuthenticationService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final TokenService tokenService;
+    private final JWTUtils jwtUtils;
 
     @Override
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO)
             throws InvalidAuthRequestException, NotFoundException {
         try {
-            Optional<User> user = userRepository.findUserByUsername(loginRequestDTO.username());
+            Optional<User> user = userRepository.findByEmail(loginRequestDTO.email());
 
             if (user.isEmpty()) {
                 log.error("User does not exist");
@@ -48,10 +43,10 @@ public class AuthenticationServiceImp implements AuthenticationService {
             }
 
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequestDTO.username(), loginRequestDTO.password()));
+                    new UsernamePasswordAuthenticationToken(loginRequestDTO.email(), loginRequestDTO.password()));
             log.info("Authenticating user: {}", auth);
 
-            String token = tokenService.generateJwt(auth);
+            String token = jwtUtils.generateToken(user.get());
 
             log.info("User successfully authenticated");
 
@@ -75,7 +70,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
             throws ConflictException, InternalServerErrorException {
 
         try {
-            Optional<User> user = userRepository.findUserByUsername(registerRequestDTO.username());
+            Optional<User> user = userRepository.findByEmail(registerRequestDTO.email());
 
             if (user.isPresent()) {
                 log.error("The username already exist");
@@ -84,14 +79,11 @@ public class AuthenticationServiceImp implements AuthenticationService {
             }
 
             String encodedPassword = passwordEncoder.encode(registerRequestDTO.password());
-            Role userRole = roleRepository.findByAuthority("USER").get();
-            Set<Role> authorities = new HashSet<>();
-            authorities.add(userRole);
 
             User newUser = User.builder()
-                    .username(registerRequestDTO.username())
+                    .email(registerRequestDTO.email())
                     .password(encodedPassword)
-                    .authorities(authorities)
+                    .role("USER")
                     .build();
 
             userRepository.save(newUser);
