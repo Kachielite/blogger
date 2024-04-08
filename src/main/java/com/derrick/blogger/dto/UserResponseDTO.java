@@ -1,8 +1,9 @@
 package com.derrick.blogger.dto;
 
+import com.derrick.blogger.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.Map;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,10 +13,14 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @RequiredArgsConstructor
-public class AuthResponseDTO {
+public class UserResponseDTO {
     private String message;
-    private String token;
-    private Map<String, String> errors;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<User> users;
+
+    public static UserResponseDTO messageOnly(String message) {
+        return UserResponseDTO.builder().message(message).build();
+    }
 }
