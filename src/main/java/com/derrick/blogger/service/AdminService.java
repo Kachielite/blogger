@@ -1,30 +1,28 @@
 package com.derrick.blogger.service;
 
-import com.derrick.blogger.dto.AuthResponseDTO;
-import com.derrick.blogger.dto.RegisterRequestDTO;
-import com.derrick.blogger.dto.UserRequestDTO;
-import com.derrick.blogger.dto.UserResponseDTO;
-import com.derrick.blogger.exceptions.BadRequestException;
+import com.derrick.blogger.dto.AdminRequestDTO;
+import com.derrick.blogger.dto.AdminResponseDTO;
+import com.derrick.blogger.dto.AdminUpdateDTO;
 import com.derrick.blogger.exceptions.ConflictException;
 import com.derrick.blogger.exceptions.InsufficientPermissionsException;
 import com.derrick.blogger.exceptions.InternalServerErrorException;
 import com.derrick.blogger.exceptions.NotFoundException;
+import org.springframework.data.domain.PageRequest;
 
 public interface AdminService {
     // Create user
-    AuthResponseDTO createUser(RegisterRequestDTO registerRequestDTO)
+    AdminResponseDTO createUser(AdminRequestDTO adminRequestDTO)
             throws ConflictException, InternalServerErrorException, InsufficientPermissionsException;
 
     // Read User
-    UserResponseDTO readUser(Integer userId) throws NotFoundException;
+    AdminResponseDTO readUser(Integer userId) throws NotFoundException;
 
     // Read Users
-    UserResponseDTO readUsers() throws NotFoundException;
+    AdminResponseDTO readUsers(PageRequest pageable);
 
     // Update User
-    UserResponseDTO updateUser(Integer userId, UserRequestDTO userRequestDTO)
-            throws NotFoundException, ConflictException, BadRequestException;
+    AdminResponseDTO updateUserRole(AdminUpdateDTO adminUpdateDTO) throws NotFoundException;
 
     // Delete User
-    UserResponseDTO deleteUser(Integer userId) throws NotFoundException;
+    AdminResponseDTO deleteUser(Integer userId) throws NotFoundException;
 }
