@@ -18,6 +18,18 @@ spring:
   threads:
     virtual:
       enabled: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: derrick.onyekachi@gmail.com
+    password: ialsrfvpjfeomtqo
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 server:
   port: 8080
   servlet:

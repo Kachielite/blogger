@@ -115,6 +115,22 @@ public class AdminController {
         }
     }
 
+    @Operation(summary = "Reset user password")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Ok"),
+                    @ApiResponse(responseCode = "403", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Not Found"),
+            })
+    @PostMapping("/users/reset-password")
+    public ResponseEntity<String> resetUserPassword(@RequestParam String email) {
+        try {
+            return new ResponseEntity<>(adminService.generateResetPasswordLink(email), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>( e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
     @Operation(summary = "Delete user")
     @ApiResponses(
             value = {

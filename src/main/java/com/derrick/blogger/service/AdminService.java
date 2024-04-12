@@ -3,6 +3,7 @@ package com.derrick.blogger.service;
 import com.derrick.blogger.dto.AdminRequestDTO;
 import com.derrick.blogger.dto.AdminResponseDTO;
 import com.derrick.blogger.dto.AdminUpdateDTO;
+import com.derrick.blogger.exceptions.BadRequestException;
 import com.derrick.blogger.exceptions.ConflictException;
 import com.derrick.blogger.exceptions.InsufficientPermissionsException;
 import com.derrick.blogger.exceptions.InternalServerErrorException;
@@ -19,6 +20,9 @@ public interface AdminService {
 
     // Read Users
     AdminResponseDTO readUsers(PageRequest pageable);
+
+    // Generate password link
+    String generateResetPasswordLink(String email) throws NotFoundException;
 
     // Update User
     AdminResponseDTO updateUserRole(AdminUpdateDTO adminUpdateDTO) throws NotFoundException;

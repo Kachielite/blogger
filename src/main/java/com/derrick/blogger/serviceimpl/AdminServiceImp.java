@@ -3,16 +3,24 @@ package com.derrick.blogger.serviceimpl;
 import com.derrick.blogger.dto.AdminRequestDTO;
 import com.derrick.blogger.dto.AdminResponseDTO;
 import com.derrick.blogger.dto.AdminUpdateDTO;
+import com.derrick.blogger.exceptions.BadRequestException;
 import com.derrick.blogger.exceptions.ConflictException;
 import com.derrick.blogger.exceptions.InsufficientPermissionsException;
 import com.derrick.blogger.exceptions.InternalServerErrorException;
 import com.derrick.blogger.exceptions.NotFoundException;
+import com.derrick.blogger.model.ResetToken;
 import com.derrick.blogger.model.User;
+import com.derrick.blogger.repository.ResetTokenRepository;
 import com.derrick.blogger.repository.UserRepository;
 import com.derrick.blogger.service.AdminService;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.derrick.blogger.service.EmailService;
+import com.derrick.blogger.service.ResetTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -22,12 +30,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static com.derrick.blogger.utils.TokenGenerator.generateUniqueToken;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AdminServiceImp implements AdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final ResetTokenService resetTokenService;
 
     @Override
     public AdminResponseDTO createUser(AdminRequestDTO adminRequestDTO)
@@ -108,6 +120,33 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
+    public String generateResetPasswordLink(String email) throws NotFoundException {
+        String subject = "Password Reset";
+        String body = "Kindly click this link to reset password ";
+        String baseUrl = "http://localhost/";
+
+
+        try {
+            Optional<User> searchUser = userRepository.findByEmail(email);
+            if (searchUser.isEmpty()) {
+                log.error("The user with provided id does not exist");
+                throw new NotFoundException("The user with email " + email + " could not be found");
+            }
+            log.info("The user found");
+            ResetToken resetToken = resetTokenService.generateResetToken(searchUser.get());
+            String token = resetToken.getToken();
+            String emailBody = body + baseUrl + token;
+            emailService.sendEmail(searchUser.get().getEmail(), subject, emailBody);
+            log.info("Reset link email sent to: {}", searchUser.get().getEmail());
+            return "Reset email link sent successfully";
+        } catch (NotFoundException e) {
+            log.error("Error user not found: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+
+    @Override
     public AdminResponseDTO updateUserRole(AdminUpdateDTO adminUpdateDTO) throws NotFoundException {
         List<User> users = new ArrayList<>();
         try {
@@ -154,4 +193,6 @@ public class AdminServiceImp implements AdminService {
             throw e;
         }
     }
+
+
 }
