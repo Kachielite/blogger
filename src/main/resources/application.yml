@@ -44,3 +44,8 @@ springdoc:
     path: /swagger-ui.html
   api-docs:
     path: /api-docs
+cloudinary:
+  cloud-name: dahpyu601
+  api:
+    key: 512538252244163
+    secret: fZ_cCYr2diy2OMmGKlL1lu_2L7M

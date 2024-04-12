@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ResetTokenRepository extends JpaRepository<ResetToken, Integer> {
     ResetToken findByToken(String token);
-
 }

@@ -3,24 +3,19 @@ package com.derrick.blogger.serviceimpl;
 import com.derrick.blogger.dto.AdminRequestDTO;
 import com.derrick.blogger.dto.AdminResponseDTO;
 import com.derrick.blogger.dto.AdminUpdateDTO;
-import com.derrick.blogger.exceptions.BadRequestException;
 import com.derrick.blogger.exceptions.ConflictException;
 import com.derrick.blogger.exceptions.InsufficientPermissionsException;
 import com.derrick.blogger.exceptions.InternalServerErrorException;
 import com.derrick.blogger.exceptions.NotFoundException;
 import com.derrick.blogger.model.ResetToken;
 import com.derrick.blogger.model.User;
-import com.derrick.blogger.repository.ResetTokenRepository;
 import com.derrick.blogger.repository.UserRepository;
 import com.derrick.blogger.service.AdminService;
-
-import java.time.LocalDateTime;
+import com.derrick.blogger.service.EmailService;
+import com.derrick.blogger.service.ResetTokenService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.derrick.blogger.service.EmailService;
-import com.derrick.blogger.service.ResetTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -29,8 +24,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import static com.derrick.blogger.utils.TokenGenerator.generateUniqueToken;
 
 @Service
 @RequiredArgsConstructor
@@ -125,7 +118,6 @@ public class AdminServiceImp implements AdminService {
         String body = "Kindly click this link to reset password ";
         String baseUrl = "http://localhost/";
 
-
         try {
             Optional<User> searchUser = userRepository.findByEmail(email);
             if (searchUser.isEmpty()) {
@@ -144,7 +136,6 @@ public class AdminServiceImp implements AdminService {
             throw e;
         }
     }
-
 
     @Override
     public AdminResponseDTO updateUserRole(AdminUpdateDTO adminUpdateDTO) throws NotFoundException {
@@ -193,6 +184,4 @@ public class AdminServiceImp implements AdminService {
             throw e;
         }
     }
-
-
 }

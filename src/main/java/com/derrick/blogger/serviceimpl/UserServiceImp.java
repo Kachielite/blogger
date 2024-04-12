@@ -1,11 +1,6 @@
 package com.derrick.blogger.serviceimpl;
 
-import com.derrick.blogger.dto.AdminResponseDTO;
 import com.derrick.blogger.dto.UserResponseDTO;
-import com.derrick.blogger.exceptions.BadRequestException;
-import com.derrick.blogger.exceptions.NotFoundException;
-import com.derrick.blogger.model.ResetToken;
-import com.derrick.blogger.model.User;
 import com.derrick.blogger.repository.UserRepository;
 import com.derrick.blogger.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,30 +36,30 @@ public class UserServiceImp implements UserService {
         return null;
     }
 
-//    @Override
-//    public AdminResponseDTO resetPassword(String token) throws BadRequestException, NotFoundException {
-//        try {
-//            boolean isTokenValid = resetTokenService.validateToken(token);
-//            if(!isTokenValid){
-//                log.error("Invalid or expired token");
-//                throw new BadRequestException("Reset password link is either expired or invalid");
-//            }
-//
-//            ResetToken resetToken = resetTokenRepository.findByToken(token);
-//            Optional<User> user = userRepository.findById(resetToken.getId());
-//
-//            if (user.isEmpty()) {
-//                log.error("UserId can not be found");
-//                throw new NotFoundException("UserId associated with reset token can not be found");
-//            }
-//
-//            user.get().setPassword();
-//
-//
-//        } catch (BadRequestException | NotFoundException e) {
-//            log.error("Error resetting password: {}", e.getMessage(), e);
-//            throw e;
-//        }
-//
-//    }
+    //    @Override
+    //    public AdminResponseDTO resetPassword(String token) throws BadRequestException, NotFoundException {
+    //        try {
+    //            boolean isTokenValid = resetTokenService.validateToken(token);
+    //            if(!isTokenValid){
+    //                log.error("Invalid or expired token");
+    //                throw new BadRequestException("Reset password link is either expired or invalid");
+    //            }
+    //
+    //            ResetToken resetToken = resetTokenRepository.findByToken(token);
+    //            Optional<User> user = userRepository.findById(resetToken.getId());
+    //
+    //            if (user.isEmpty()) {
+    //                log.error("UserId can not be found");
+    //                throw new NotFoundException("UserId associated with reset token can not be found");
+    //            }
+    //
+    //            user.get().setPassword();
+    //
+    //
+    //        } catch (BadRequestException | NotFoundException e) {
+    //            log.error("Error resetting password: {}", e.getMessage(), e);
+    //            throw e;
+    //        }
+    //
+    //    }
 }
