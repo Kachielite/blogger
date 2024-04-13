@@ -51,6 +51,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
             log.info("User successfully authenticated");
 
             return AuthResponseDTO.builder()
+                    .statusCode(200)
                     .message("User authenticated successfully")
                     .token(token)
                     .build();
@@ -88,6 +89,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
             userRepository.save(newUser);
             return AuthResponseDTO.builder()
+                    .statusCode(201)
                     .message("Registration successful!")
                     .token(null)
                     .build();

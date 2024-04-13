@@ -3,6 +3,7 @@ package com.derrick.blogger.controller;
 import com.derrick.blogger.dto.AdminRequestDTO;
 import com.derrick.blogger.dto.AdminResponseDTO;
 import com.derrick.blogger.dto.AdminUpdateDTO;
+import com.derrick.blogger.dto.ErrorResponseDTO;
 import com.derrick.blogger.exceptions.ConflictException;
 import com.derrick.blogger.exceptions.InsufficientPermissionsException;
 import com.derrick.blogger.exceptions.InternalServerErrorException;
@@ -42,25 +43,38 @@ public class AdminController {
     @ApiResponses(
             value = {
                 @ApiResponse(responseCode = "201", description = "Created"),
-                @ApiResponse(responseCode = "403", description = "Unauthorized"),
+                @ApiResponse(responseCode = "400", description = "Bad Request"),
+                @ApiResponse(responseCode = "401", description = "Unauthorized"),
                 @ApiResponse(responseCode = "409", description = "Conflict"),
             })
     @PostMapping("/create-user")
-    public ResponseEntity<AdminResponseDTO> createUser(
+    public ResponseEntity<?> createUser(
             @Valid @RequestBody AdminRequestDTO adminRequestDTO, BindingResult bindingResult) {
         try {
-            ResponseEntity<AdminResponseDTO> errors = validateInput(bindingResult);
+            ResponseEntity<ErrorResponseDTO> errors = validateInput(bindingResult);
             if (errors != null) return errors;
             return new ResponseEntity<>(adminService.createUser(adminRequestDTO), HttpStatus.CREATED);
         } catch (InsufficientPermissionsException e) {
             return new ResponseEntity<>(
-                    AdminResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.UNAUTHORIZED);
+                    ErrorResponseDTO.builder()
+                            .statusCode(401)
+                            .message(e.getMessage())
+                            .build(),
+                    HttpStatus.UNAUTHORIZED);
         } catch (ConflictException e) {
             return new ResponseEntity<>(
-                    AdminResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.CONFLICT);
+                    ErrorResponseDTO.builder()
+                            .statusCode(409)
+                            .message(e.getMessage())
+                            .build(),
+                    HttpStatus.CONFLICT);
         } catch (InternalServerErrorException e) {
             return new ResponseEntity<>(
-                    AdminResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    ErrorResponseDTO.builder()
+                            .statusCode(500)
+                            .message(e.getMessage())
+                            .build(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -68,16 +82,20 @@ public class AdminController {
     @ApiResponses(
             value = {
                 @ApiResponse(responseCode = "200", description = "Ok"),
-                @ApiResponse(responseCode = "403", description = "Unauthorized"),
+                @ApiResponse(responseCode = "401", description = "Unauthorized"),
                 @ApiResponse(responseCode = "404", description = "Not Found"),
             })
     @GetMapping("/users/{userId}")
-    public ResponseEntity<AdminResponseDTO> fetchUser(@PathVariable String userId) {
+    public ResponseEntity<?> fetchUser(@PathVariable String userId) {
         try {
             return new ResponseEntity<>(adminService.readUser(Integer.valueOf(userId)), HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(
-                    AdminResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.NOT_FOUND);
+                    ErrorResponseDTO.builder()
+                            .statusCode(404)
+                            .message(e.getMessage())
+                            .build(),
+                    HttpStatus.NOT_FOUND);
         }
     }
 
@@ -99,19 +117,40 @@ public class AdminController {
     @ApiResponses(
             value = {
                 @ApiResponse(responseCode = "200", description = "Ok"),
+                @ApiResponse(responseCode = "400", description = "Bad Request"),
                 @ApiResponse(responseCode = "403", description = "Unauthorized"),
                 @ApiResponse(responseCode = "404", description = "Not Found"),
             })
     @PutMapping("/users")
-    public ResponseEntity<AdminResponseDTO> updateUserRole(
+    public ResponseEntity<?> updateUserRole(
             @Valid @RequestBody AdminUpdateDTO adminUpdateDTO, BindingResult bindingResult) {
         try {
-            ResponseEntity<AdminResponseDTO> errors = validateInput(bindingResult);
+            ResponseEntity<ErrorResponseDTO> errors = validateInput(bindingResult);
             if (errors != null) return errors;
             return new ResponseEntity<>(adminService.updateUserRole(adminUpdateDTO), HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(
-                    AdminResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.NOT_FOUND);
+                    ErrorResponseDTO.builder()
+                            .statusCode(404)
+                            .message(e.getMessage())
+                            .build(),
+                    HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Operation(summary = "Reset user password")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Ok"),
+                @ApiResponse(responseCode = "403", description = "Unauthorized"),
+                @ApiResponse(responseCode = "404", description = "Not Found"),
+            })
+    @PostMapping("/users/reset-password")
+    public ResponseEntity<String> resetUserPassword(@RequestParam String email) {
+        try {
+            return new ResponseEntity<>(adminService.generateResetPasswordLink(email), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -123,16 +162,20 @@ public class AdminController {
                 @ApiResponse(responseCode = "404", description = "Not Found"),
             })
     @DeleteMapping("/users/{userId}")
-    public ResponseEntity<AdminResponseDTO> deleteUser(@PathVariable String userId) {
+    public ResponseEntity<?> deleteUser(@PathVariable String userId) {
         try {
             return new ResponseEntity<>(adminService.deleteUser(Integer.valueOf(userId)), HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(
-                    AdminResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.NOT_FOUND);
+                    ErrorResponseDTO.builder()
+                            .statusCode(404)
+                            .message(e.getMessage())
+                            .build(),
+                    HttpStatus.NOT_FOUND);
         }
     }
 
-    private ResponseEntity<AdminResponseDTO> validateInput(BindingResult bindingResult) {
+    private ResponseEntity<ErrorResponseDTO> validateInput(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error -> {
@@ -140,7 +183,8 @@ public class AdminController {
             });
             // Return bad request with validation errors
             return new ResponseEntity<>(
-                    AdminResponseDTO.builder()
+                    ErrorResponseDTO.builder()
+                            .statusCode(400)
                             .message("Validation error")
                             .errors(errors)
                             .build(),

@@ -69,15 +69,6 @@ public class JWTFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void handleExpiredJwtException(HttpServletResponse response) throws IOException {
-        Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("message", "JWT token expired");
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setContentType("application/json");
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), errorDetails);
-    }
-
     private void handleJwtException(HttpServletResponse response, String message, HttpStatus status)
             throws IOException {
         Map<String, Object> errorDetails = new HashMap<>();

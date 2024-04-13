@@ -20,6 +20,9 @@ public interface AdminService {
     // Read Users
     AdminResponseDTO readUsers(PageRequest pageable);
 
+    // Generate password link
+    String generateResetPasswordLink(String email) throws NotFoundException;
+
     // Update User
     AdminResponseDTO updateUserRole(AdminUpdateDTO adminUpdateDTO) throws NotFoundException;
 

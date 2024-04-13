@@ -1,4 +1,12 @@
 package com.derrick.blogger.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public record UserRequestDTO(
-        String password, String profilePhoto, String bio, String x, String instagram, String facebook, String role) {}
+        MultipartFile profilePhoto,
+        String bio,
+        String x,
+        String instagram,
+        String facebook,
+        String password,
+        String token) {}
