@@ -2,6 +2,7 @@ package com.derrick.blogger.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +14,8 @@ import lombok.RequiredArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @RequiredArgsConstructor
-public class AuthResponseDTO {
+public class ErrorResponseDTO {
     private Integer statusCode;
     private String message;
-    private String token;
+    private Map<String, String> errors;
 }

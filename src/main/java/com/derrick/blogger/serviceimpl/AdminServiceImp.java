@@ -40,6 +40,7 @@ public class AdminServiceImp implements AdminService {
 
         List<User> users = new ArrayList<>();
         try {
+            log.info("Email received: {} , Password received: {}", adminRequestDTO.email(), adminRequestDTO.password());
             // Check if the current user has the required authority
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
@@ -65,6 +66,7 @@ public class AdminServiceImp implements AdminService {
             User savedUser = userRepository.save(newUser);
             users.add(savedUser);
             return AdminResponseDTO.builder()
+                    .statusCode(201)
                     .message("Registration successful!")
                     .user(users)
                     .build();
@@ -92,6 +94,7 @@ public class AdminServiceImp implements AdminService {
             log.info("The user found");
             users.add(user.get());
             return AdminResponseDTO.builder()
+                    .statusCode(200)
                     .message("User successfully retrieved")
                     .user(users)
                     .build();
@@ -107,6 +110,7 @@ public class AdminServiceImp implements AdminService {
         List<User> users;
         users = userRepository.findAll();
         return AdminResponseDTO.builder()
+                .statusCode(200)
                 .message("Users successfully retrieved")
                 .user(users)
                 .build();
@@ -153,6 +157,7 @@ public class AdminServiceImp implements AdminService {
             users.add(user);
             log.info("The user updated");
             return AdminResponseDTO.builder()
+                    .statusCode(200)
                     .message("User role successfully updated")
                     .user(users)
                     .build();
@@ -176,6 +181,7 @@ public class AdminServiceImp implements AdminService {
             userRepository.delete(user);
             log.info("The user deleted");
             return AdminResponseDTO.builder()
+                    .statusCode(200)
                     .message("User successfully deleted")
                     .build();
 
