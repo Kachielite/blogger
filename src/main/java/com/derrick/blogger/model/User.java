@@ -40,6 +40,12 @@ public class User implements UserDetails {
     private Integer id;
 
     @NotBlank
+    private String firstName;
+
+    @NotBlank
+    private String lastName;
+
+    @NotBlank
     private String email;
 
     @NotBlank
@@ -57,9 +63,6 @@ public class User implements UserDetails {
     private String x;
     private String instagram;
     private String facebook;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Blog> blogs;
 
     @Override
     @JsonIgnore

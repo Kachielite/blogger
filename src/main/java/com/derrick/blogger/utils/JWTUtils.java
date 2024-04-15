@@ -8,10 +8,10 @@ import java.util.Date;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class JWTUtils {
     private final SecretKey key;
     private static final long EXPIRATION_TIME = 8640000;
@@ -38,11 +38,6 @@ public class JWTUtils {
     private <T> T extractClaim(String token, Function<Claims, T> claimsFunction) {
         return claimsFunction.apply(
                 Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload());
-    }
-
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        String userEmail = extractUsername(token);
-        return (userEmail.equals(userDetails.getUsername()) && isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {

@@ -58,6 +58,8 @@ public class AdminServiceImp implements AdminService {
             String encodedPassword = passwordEncoder.encode(adminRequestDTO.password());
 
             User newUser = User.builder()
+                    .firstName(adminRequestDTO.firstName())
+                    .lastName(adminRequestDTO.lastName())
                     .email(adminRequestDTO.email())
                     .password(encodedPassword)
                     .role(adminRequestDTO.role())

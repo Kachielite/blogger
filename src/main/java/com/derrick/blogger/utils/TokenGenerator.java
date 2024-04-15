@@ -2,9 +2,9 @@ package com.derrick.blogger.utils;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class TokenGenerator {
     private static final int TOKEN_LENGTH = 64;
 
