@@ -122,7 +122,7 @@ public class BlogServiceImpl implements BlogService {
 
             if (blogUpdateDTO.status() != null) {
                 log.info("Updating blog status");
-                blogToUpdate.setStatus(blogToUpdate.getStatus());
+                blogToUpdate.setStatus(blogUpdateDTO.status());
                 log.info("Updated blog status");
             }
 
@@ -134,7 +134,7 @@ public class BlogServiceImpl implements BlogService {
 
             return BlogResponseDTO.builder()
                     .statusCode(201)
-                    .message("Blog created successfully")
+                    .message("Blog successfully updated.")
                     .blogs(blogs)
                     .build();
 

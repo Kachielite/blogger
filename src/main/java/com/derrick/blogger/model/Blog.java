@@ -37,8 +37,6 @@ public class Blog {
 
     private String coverPhoto;
 
-    private Integer photoPublicId;
-
     private String slug;
 
     private String content;

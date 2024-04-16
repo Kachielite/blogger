@@ -14,7 +14,7 @@ public interface BlogService {
     BlogResponseDTO createBlog(BlogRequestDTO blogRequestDTO) throws IOException, BadRequestException;
 
     BlogResponseDTO updateBlog(Integer blogId, BlogUpdateDTO blogUpdateDTO)
-            throws NotFoundException, BadRequestException, InternalServerErrorException, IOException;
+            throws NotFoundException, BadRequestException, RuntimeException, IOException;
 
     BlogResponseDTO readBlogByID(Integer blogId) throws NotFoundException, InternalServerErrorException;
 
