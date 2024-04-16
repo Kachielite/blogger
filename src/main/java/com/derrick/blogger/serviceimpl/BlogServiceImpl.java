@@ -2,6 +2,8 @@ package com.derrick.blogger.serviceimpl;
 
 import com.derrick.blogger.dto.BlogRequestDTO;
 import com.derrick.blogger.dto.BlogResponseDTO;
+import com.derrick.blogger.dto.BlogUpdateDTO;
+import com.derrick.blogger.exceptions.NotFoundException;
 import com.derrick.blogger.model.Blog;
 import com.derrick.blogger.model.User;
 import com.derrick.blogger.repository.BlogRepository;
@@ -55,25 +57,10 @@ public class BlogServiceImpl implements BlogService {
                     .content(blogRequestDTO.content())
                     .build();
             Blog savedBlog = blogRepository.save(newBlog);
-            log.info("Saved ew blog");
+            log.info("Saved new blog");
 
-            // Construct the BlogResponseDTO with a list containing the saved blog
-            List<BlogResponseDTO.BlogList> blogs = new ArrayList<>();
-            BlogResponseDTO.BlogList blogList = BlogResponseDTO.BlogList.builder()
-                    .id(savedBlog.getId())
-                    .title(savedBlog.getTitle())
-                    .coverPhoto(savedBlog.getCoverPhoto())
-                    .slug(savedBlog.getSlug())
-                    .content(savedBlog.getContent())
-                    .status(savedBlog.getStatus())
-                    .author(BlogResponseDTO.BlogList.Author.builder()
-                            .firstName(savedBlog.getUser().getFirstName())
-                            .lastName(savedBlog.getUser().getLastName())
-                            .email(savedBlog.getUser().getEmail())
-                            .profilePhoto(savedBlog.getUser().getProfilePhoto())
-                            .build())
-                    .build();
-            blogs.add(blogList);
+            // Process blog into the BlogResponse DTO
+            List<BlogResponseDTO.BlogList> blogs = processBlogData(savedBlog);
 
             return BlogResponseDTO.builder()
                     .statusCode(201)
@@ -83,6 +70,82 @@ public class BlogServiceImpl implements BlogService {
 
         } catch (IOException e) {
             log.error("Error uploading blog photo");
+            throw e;
+        } catch (RuntimeException e) {
+            log.error("Something went wrong!");
+            throw e;
+        }
+    }
+
+    @Override
+    public BlogResponseDTO updateBlog(Integer blogId, BlogUpdateDTO blogUpdateDTO)
+            throws NotFoundException, IOException {
+        try {
+            log.info("Searching blog with id with " + blogId);
+            Optional<Blog> searchedBlog = blogRepository.findById(blogId);
+            if (searchedBlog.isEmpty()) {
+                throw new NotFoundException("Blog with ID " + blogId + " could not be found");
+            }
+
+            Blog blogToUpdate = searchedBlog.get();
+
+            if (blogUpdateDTO.title() != null && !blogUpdateDTO.title().isEmpty()) {
+                log.info("Updating blog title and slug");
+                blogToUpdate.setTitle(blogUpdateDTO.title());
+                blogToUpdate.setSlug(slugGenerator.generateSlug(blogUpdateDTO.title()));
+                log.info("Updated blog title and slug");
+            }
+
+            if (blogUpdateDTO.coverPhoto() != null
+                    && !blogUpdateDTO.coverPhoto().isEmpty()) {
+                log.info("Updating blog coverPhoto");
+                if (blogToUpdate.getCoverPhoto() != null
+                        && blogToUpdate.getCoverPhoto().isEmpty()) {
+                    cloudinaryService.deleteImage(blogToUpdate.getCoverPhoto());
+                }
+                String coverPhoto = cloudinaryService.uploadImage(blogUpdateDTO.coverPhoto(), "blogger-post-images");
+                blogToUpdate.setCoverPhoto(coverPhoto);
+                log.info("Updated blog coverPhoto");
+            }
+
+            if (blogUpdateDTO.content() != null && !blogUpdateDTO.content().isEmpty()) {
+                log.info("Updating blog content");
+                blogToUpdate.setContent(blogUpdateDTO.content());
+                log.info("Updated blog content");
+            }
+
+            if (blogUpdateDTO.tags() != null && !blogUpdateDTO.tags().isEmpty()) {
+                log.info("Updating blog tags");
+                blogToUpdate.setTags(blogToUpdate.getTags());
+                log.info("Updated blog tags");
+            }
+
+            if (blogUpdateDTO.status() != null) {
+                log.info("Updating blog status");
+                blogToUpdate.setStatus(blogToUpdate.getStatus());
+                log.info("Updated blog status");
+            }
+
+            log.info("Updating blog");
+            Blog updatedBlog = blogRepository.save(blogToUpdate);
+
+            // Process blog into the BlogResponse DTO
+            List<BlogResponseDTO.BlogList> blogs = processBlogData(updatedBlog);
+
+            return BlogResponseDTO.builder()
+                    .statusCode(201)
+                    .message("Blog created successfully")
+                    .blogs(blogs)
+                    .build();
+
+        } catch (NotFoundException e) {
+            log.error("Blog with ID " + blogId + " could not be found");
+            throw e;
+        } catch (IOException e) {
+            log.error("Error new blog photo");
+            throw e;
+        } catch (RuntimeException e) {
+            log.error("Something went wrong!");
             throw e;
         }
     }
@@ -103,13 +166,29 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public BlogResponseDTO updateBlog(Integer blogId) {
-        return null;
-    }
-
-    @Override
     public BlogResponseDTO deleteBlogById(Integer blogId) {
         return null;
     }
 
+    private List<BlogResponseDTO.BlogList> processBlogData(Blog blog) {
+        // Construct the BlogResponseDTO with a list containing the saved blog
+        List<BlogResponseDTO.BlogList> blogs = new ArrayList<>();
+        BlogResponseDTO.BlogList blogList = BlogResponseDTO.BlogList.builder()
+                .id(blog.getId())
+                .title(blog.getTitle())
+                .coverPhoto(blog.getCoverPhoto())
+                .slug(blog.getSlug())
+                .content(blog.getContent())
+                .status(blog.getStatus())
+                .author(BlogResponseDTO.BlogList.Author.builder()
+                        .firstName(blog.getUser().getFirstName())
+                        .lastName(blog.getUser().getLastName())
+                        .email(blog.getUser().getEmail())
+                        .profilePhoto(blog.getUser().getProfilePhoto())
+                        .build())
+                .build();
+        blogs.add(blogList);
+
+        return blogs;
+    }
 }

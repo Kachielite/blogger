@@ -10,4 +10,3 @@ public record BlogRequestDTO(
         @NotNull(message = "content cannot be blank") String content,
         @NotNull(message = "content cannot be blank") String tags,
         @NotNull(message = "content cannot be blank") BlogStatus status) {}
-

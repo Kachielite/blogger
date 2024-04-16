@@ -1,7 +1,6 @@
 package com.derrick.blogger.dto;
 
 import com.derrick.blogger.enums.BlogStatus;
-import com.derrick.blogger.model.Blog;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
@@ -50,6 +49,5 @@ public class BlogResponseDTO {
             private String email;
             private String profilePhoto;
         }
-
     }
 }
