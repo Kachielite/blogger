@@ -108,8 +108,8 @@ public class AdminController {
             })
     @GetMapping("/users")
     public ResponseEntity<AdminResponseDTO> fetchUser(
-            @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int page) {
-        PageRequest pageable = PageRequest.of(offset, page);
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        PageRequest pageable = PageRequest.of(page, size);
         return new ResponseEntity<>(adminService.readUsers(pageable), HttpStatus.OK);
     }
 

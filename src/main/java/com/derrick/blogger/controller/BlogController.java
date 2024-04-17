@@ -1,6 +1,7 @@
 package com.derrick.blogger.controller;
 
 import com.derrick.blogger.dto.BlogRequestDTO;
+import com.derrick.blogger.dto.BlogResponseDTO;
 import com.derrick.blogger.dto.BlogUpdateDTO;
 import com.derrick.blogger.dto.ErrorResponseDTO;
 import com.derrick.blogger.exceptions.BadRequestException;
@@ -18,11 +19,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -97,6 +101,76 @@ public class BlogController {
                             .message(e.getMessage())
                             .build(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Fetch blog by Id")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "OK"),
+                @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                @ApiResponse(responseCode = "404", description = "Not Found"),
+            })
+    @GetMapping("/{blogId}")
+    public ResponseEntity<?> fetchBlogById(@PathVariable Integer blogId) {
+        try {
+            return new ResponseEntity<>(blogService.readBlogByID(blogId), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(
+                    ErrorResponseDTO.builder()
+                            .statusCode(400)
+                            .message(e.getMessage())
+                            .build(),
+                    HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Operation(summary = "Fetch blog by user id")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "OK"),
+                @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                @ApiResponse(responseCode = "404", description = "Not Found"),
+            })
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<BlogResponseDTO> fetchBlogByUserId(
+            @PathVariable Integer userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return new ResponseEntity<>(blogService.readBlogByUserId(userId, page, size), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Fetch all blogs")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "OK"),
+                @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                @ApiResponse(responseCode = "404", description = "Not Found"),
+            })
+    @GetMapping()
+    public ResponseEntity<BlogResponseDTO> fetchAllBlogs(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return new ResponseEntity<>(blogService.readAllBlogs(page, size), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Delete a blog post")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "OK"),
+                @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                @ApiResponse(responseCode = "404", description = "Not Found"),
+            })
+    @DeleteMapping("/{blogId}")
+    public ResponseEntity<?> deleteBlogById(@PathVariable String blogId) {
+        try {
+            return new ResponseEntity<>(blogService.deleteBlogById(Integer.valueOf(blogId)), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(
+                    ErrorResponseDTO.builder()
+                            .statusCode(400)
+                            .message(e.getMessage())
+                            .build(),
+                    HttpStatus.NOT_FOUND);
         }
     }
 
