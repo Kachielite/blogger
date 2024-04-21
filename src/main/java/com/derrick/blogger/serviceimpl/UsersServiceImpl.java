@@ -12,6 +12,7 @@ import com.derrick.blogger.service.CloudinaryService;
 import com.derrick.blogger.service.EmailService;
 import com.derrick.blogger.service.ResetTokenService;
 import com.derrick.blogger.service.UsersService;
+import com.derrick.blogger.utils.CloudinaryUrlParser;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class UsersServiceImpl implements UsersService {
     private final EmailService emailService;
     private final ResetTokenRepository resetTokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CloudinaryUrlParser cloudinaryUrlParser;
 
     @Override
     public UserResponseDTO updateUser(Integer userId, UserRequestDTO userRequestDTO)
@@ -45,6 +47,10 @@ public class UsersServiceImpl implements UsersService {
                     && !userRequestDTO.profilePhoto().isEmpty()) {
                 try {
                     log.info("Uploading user profile photo");
+                    if (searchUser.get().getProfilePhoto() != null
+                            && !searchUser.get().getProfilePhoto().isEmpty()) {
+                        cloudinaryService.deleteImage(searchUser.get().getProfilePhoto());
+                    }
                     String profileImage =
                             cloudinaryService.uploadImage(userRequestDTO.profilePhoto(), "blogger-profiles");
                     log.info("User profile photo uploaded");

@@ -1,9 +1,10 @@
 package com.derrick.blogger.dto;
 
+import com.derrick.blogger.model.Blog;
 import com.derrick.blogger.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.Map;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +19,5 @@ import lombok.RequiredArgsConstructor;
 public class UserResponseDTO {
     private String message;
     private User user;
-    private Map<String, String> errors;
+    private List<Blog> blogs;
 }

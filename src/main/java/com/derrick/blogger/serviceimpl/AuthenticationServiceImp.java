@@ -82,6 +82,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
             String encodedPassword = passwordEncoder.encode(registerRequestDTO.password());
 
             User newUser = User.builder()
+                    .firstName(registerRequestDTO.firstName())
+                    .lastName(registerRequestDTO.lastName())
                     .email(registerRequestDTO.email())
                     .password(encodedPassword)
                     .role("USER")
