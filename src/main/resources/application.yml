@@ -42,6 +42,7 @@ logging:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    defaultModelsExpandDepth: -1
   api-docs:
     path: /api-docs
 cloudinary:

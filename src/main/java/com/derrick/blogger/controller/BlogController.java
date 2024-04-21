@@ -8,8 +8,11 @@ import com.derrick.blogger.exceptions.BadRequestException;
 import com.derrick.blogger.exceptions.NotFoundException;
 import com.derrick.blogger.service.BlogService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -37,14 +40,27 @@ public class BlogController {
     private final BlogService blogService;
 
     @Operation(summary = "Create new blog")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "201", description = "Created"),
-                @ApiResponse(responseCode = "400", description = "Bad Request"),
-                @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                @ApiResponse(responseCode = "409", description = "Conflict"),
+                @ApiResponse(
+                        responseCode = "201",
+                        description = "Created",
+                        content = @Content(schema = @Schema(implementation = BlogResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Bad Request",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "409",
+                        description = "Conflict",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @PostMapping
+    @PostMapping(produces = "application/json", consumes = "multipart/form-data")
     public ResponseEntity<?> createNewBlog(
             @Valid @ModelAttribute BlogRequestDTO blogRequestDTO, BindingResult bindingResult) {
         try {
@@ -62,15 +78,31 @@ public class BlogController {
     }
 
     @Operation(summary = "Update blog")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "201", description = "Created"),
-                @ApiResponse(responseCode = "400", description = "Bad Request"),
-                @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                @ApiResponse(responseCode = "409", description = "Conflict"),
-                @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+                @ApiResponse(
+                        responseCode = "201",
+                        description = "Created",
+                        content = @Content(schema = @Schema(implementation = BlogResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Bad Request",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "409",
+                        description = "Conflict",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal Server Error",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @PutMapping("/{blogId}")
+    @PutMapping(value = "/{blogId}", produces = "application/json", consumes = "multipart/form-data")
     public ResponseEntity<?> updateBlog(
             @PathVariable String blogId,
             @Valid @ModelAttribute BlogUpdateDTO blogUpdateDTO,
@@ -107,14 +139,23 @@ public class BlogController {
     @Operation(summary = "Fetch blog by Id")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "OK"),
-                @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content = @Content(schema = @Schema(implementation = BlogResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @GetMapping("/{blogId}")
-    public ResponseEntity<?> fetchBlogById(@PathVariable Integer blogId) {
+    @GetMapping(value = "/{blogId}", produces = "application/json")
+    public ResponseEntity<?> fetchBlogById(@PathVariable String blogId) {
         try {
-            return new ResponseEntity<>(blogService.readBlogByID(blogId), HttpStatus.OK);
+            return new ResponseEntity<>(blogService.readBlogByID(Integer.valueOf(blogId)), HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(
                     ErrorResponseDTO.builder()
@@ -128,39 +169,67 @@ public class BlogController {
     @Operation(summary = "Fetch blog by user id")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "OK"),
-                @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content = @Content(schema = @Schema(implementation = BlogResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @GetMapping("/user/{userId}")
+    @GetMapping(value = "/user/{userId}", produces = "application/json")
     public ResponseEntity<BlogResponseDTO> fetchBlogByUserId(
-            @PathVariable Integer userId,
+            @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return new ResponseEntity<>(blogService.readBlogByUserId(userId, page, size), HttpStatus.OK);
+        return new ResponseEntity<>(blogService.readBlogByUserId(Integer.valueOf(userId), page, size), HttpStatus.OK);
     }
 
     @Operation(summary = "Fetch all blogs")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "OK"),
-                @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content = @Content(schema = @Schema(implementation = BlogResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @GetMapping()
+    @GetMapping(produces = "application/json")
     public ResponseEntity<BlogResponseDTO> fetchAllBlogs(
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         return new ResponseEntity<>(blogService.readAllBlogs(page, size), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete a blog post")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "OK"),
-                @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content = @Content(schema = @Schema(implementation = BlogResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @DeleteMapping("/{blogId}")
+    @DeleteMapping(value = "/{blogId}", produces = "application/json")
     public ResponseEntity<?> deleteBlogById(@PathVariable String blogId) {
         try {
             return new ResponseEntity<>(blogService.deleteBlogById(Integer.valueOf(blogId)), HttpStatus.OK);

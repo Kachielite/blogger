@@ -10,8 +10,11 @@ import com.derrick.blogger.exceptions.InternalServerErrorException;
 import com.derrick.blogger.exceptions.NotFoundException;
 import com.derrick.blogger.service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.HashMap;
@@ -40,14 +43,27 @@ public class AdminController {
     public final AdminService adminService;
 
     @Operation(summary = "Create new user")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "201", description = "Created"),
-                @ApiResponse(responseCode = "400", description = "Bad Request"),
-                @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                @ApiResponse(responseCode = "409", description = "Conflict"),
+                @ApiResponse(
+                        responseCode = "201",
+                        description = "Created",
+                        content = @Content(schema = @Schema(implementation = AdminResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Bad Request",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "409",
+                        description = "Conflict",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @PostMapping("/create-user")
+    @PostMapping(value = "/create-user", produces = "application/json", consumes = "application/json")
     public ResponseEntity<?> createUser(
             @Valid @RequestBody AdminRequestDTO adminRequestDTO, BindingResult bindingResult) {
         try {
@@ -79,13 +95,23 @@ public class AdminController {
     }
 
     @Operation(summary = "Fetch user by id")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Ok"),
-                @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Ok",
+                        content = @Content(schema = @Schema(implementation = AdminResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @GetMapping("/users/{userId}")
+    @GetMapping(value = "/users/{userId}", produces = "application/json")
     public ResponseEntity<?> fetchUser(@PathVariable String userId) {
         try {
             return new ResponseEntity<>(adminService.readUser(Integer.valueOf(userId)), HttpStatus.OK);
@@ -100,28 +126,47 @@ public class AdminController {
     }
 
     @Operation(summary = "Fetch all users")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Ok"),
-                @ApiResponse(responseCode = "403", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Ok",
+                        content = @Content(schema = @Schema(implementation = AdminResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "403",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @GetMapping("/users")
-    public ResponseEntity<AdminResponseDTO> fetchUser(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        PageRequest pageable = PageRequest.of(page, size);
+    @GetMapping(value = "/users", produces = "application/json")
+    public ResponseEntity<?> fetchUser(
+            @RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "10") String size) {
+        PageRequest pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(size));
         return new ResponseEntity<>(adminService.readUsers(pageable), HttpStatus.OK);
     }
 
     @Operation(summary = "Update user role")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Ok"),
-                @ApiResponse(responseCode = "400", description = "Bad Request"),
-                @ApiResponse(responseCode = "403", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Ok",
+                        content = @Content(schema = @Schema(implementation = AdminResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "403",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @PutMapping("/users")
+    @PutMapping(value = "/users", produces = "application/json", consumes = "application/json")
     public ResponseEntity<?> updateUserRole(
             @Valid @RequestBody AdminUpdateDTO adminUpdateDTO, BindingResult bindingResult) {
         try {
@@ -139,11 +184,21 @@ public class AdminController {
     }
 
     @Operation(summary = "Reset user password")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Ok"),
-                @ApiResponse(responseCode = "403", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Ok",
+                        content = @Content(schema = @Schema(implementation = String.class))),
+                @ApiResponse(
+                        responseCode = "403",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
     @PostMapping("/users/reset-password")
     public ResponseEntity<String> resetUserPassword(@RequestParam String email) {
@@ -155,13 +210,23 @@ public class AdminController {
     }
 
     @Operation(summary = "Delete user")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Ok"),
-                @ApiResponse(responseCode = "403", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Ok",
+                        content = @Content(schema = @Schema(implementation = AdminResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "403",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping(value = "/users/{userId}", produces = "application/json")
     public ResponseEntity<?> deleteUser(@PathVariable String userId) {
         try {
             return new ResponseEntity<>(adminService.deleteUser(Integer.valueOf(userId)), HttpStatus.OK);
