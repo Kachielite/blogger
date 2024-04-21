@@ -1,12 +1,16 @@
 package com.derrick.blogger.controller;
 
+import com.derrick.blogger.dto.ErrorResponseDTO;
 import com.derrick.blogger.dto.UserRequestDTO;
 import com.derrick.blogger.dto.UserResponseDTO;
 import com.derrick.blogger.exceptions.NotFoundException;
 import com.derrick.blogger.service.UsersService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +31,27 @@ public class UserController {
     private final UsersService usersService;
 
     @Operation(summary = "Fetch user details")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Ok"),
-                @ApiResponse(responseCode = "401", description = "IO Exception"),
-                @ApiResponse(responseCode = "403", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Ok",
+                        content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "IO Exception",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "403",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @GetMapping("/{userId}")
+    @GetMapping(value = "/{userId}", produces = "application/json")
     public ResponseEntity<UserResponseDTO> fetchUserDetails(@PathVariable String userId) {
         try {
             return new ResponseEntity<>(usersService.readUser(Integer.valueOf(userId)), HttpStatus.OK);
@@ -45,14 +62,27 @@ public class UserController {
     }
 
     @Operation(summary = "update user profile")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Ok"),
-                @ApiResponse(responseCode = "401", description = "IO Exception"),
-                @ApiResponse(responseCode = "403", description = "Unauthorized"),
-                @ApiResponse(responseCode = "404", description = "Not Found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Ok",
+                        content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "IO Exception",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "403",
+                        description = "Unauthorized",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
             })
-    @PutMapping("/{userId}")
+    @PutMapping(value = "/{userId}", produces = "application/json", consumes = "multipart/form-data")
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable String userId, @ModelAttribute UserRequestDTO userRequestDTO) {
         try {
