@@ -1,7 +1,6 @@
 package com.derrick.blogger.model;
 
 import com.derrick.blogger.enums.BlogStatus;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

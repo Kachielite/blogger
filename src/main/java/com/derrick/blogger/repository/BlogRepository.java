@@ -1,9 +1,8 @@
 package com.derrick.blogger.repository;
 
 import com.derrick.blogger.model.Blog;
-import java.util.List;
-
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
